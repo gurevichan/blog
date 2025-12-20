@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -9,118 +8,317 @@
     <!-- Tailwind for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Babel Standalone: Essential for running .tsx directly in browser -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&family=Frank+Ruhl+Libre:wght@300..900&display=swap" rel="stylesheet">
     
     <style>
+        :root {
+            --bg-color: #fcfcfc;
+            --text-main: #18181b;
+            --text-muted: #71717a;
+        }
         body {
             font-family: 'Assistant', sans-serif;
-            background-color: #fcfcfc;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            transition: opacity 0.3s ease;
         }
         .serif {
             font-family: 'Frank Ruhl Libre', serif;
         }
+        .prose h2 { font-family: 'Frank Ruhl Libre', serif; font-size: 1.875rem; font-weight: 500; margin-top: 2rem; margin-bottom: 1rem; }
+        .prose p { line-height: 1.8; margin-bottom: 1.5rem; font-size: 1.125rem; }
         .prose blockquote {
-            border-right-width: 4px;
-            border-right-color: #e5e7eb;
-            border-left-width: 0;
+            border-right: 4px solid #e5e7eb;
+            padding-right: 1.5rem;
+            margin: 2rem 0;
             font-style: italic;
             color: #4b5563;
-            padding-right: 1.5rem;
-            padding-left: 0;
         }
-        .prose {
-            text-align: right;
-        }
-        /* Debug Banner Styles */
         #debug-status {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: #fef3c7;
-            color: #92400e;
+            background: #ecfdf5;
+            color: #065f46;
             font-family: monospace;
             font-size: 10px;
             padding: 4px 10px;
             z-index: 9999;
-            border-bottom: 1px solid #f59e0b;
+            border-bottom: 1px solid #10b981;
             display: flex;
             justify-content: space-between;
-            direction: ltr; /* Force LTR for debug info */
+            direction: ltr;
         }
-    </style>
-
-    <script>
-        // Initialize process shim
-        window.process = { env: { API_KEY: "" } };
+        .view-section { display: none; }
+        .view-section.active { display: block; }
         
-        // Debugging state
-        window.DEBUG_STATE = {
-            htmlLoaded: new Date().toLocaleTimeString(),
-            babelLoaded: false,
-            appStarted: false,
-            errors: []
-        };
-
-        function updateDebugUI() {
-            const el = document.getElementById('debug-status');
-            if (el) {
-                el.innerHTML = `
-                    <span><b>STATUS:</b> HTML: ${window.DEBUG_STATE.htmlLoaded} | 
-                    Babel: ${window.DEBUG_STATE.babelLoaded ? '✅' : '⏳'} | 
-                    App: ${window.DEBUG_STATE.appStarted ? '✅' : '⏳'}</span>
-                    <span>${window.DEBUG_STATE.errors.length > 0 ? '❌ Errors in Console' : 'No Errors detected'}</span>
-                `;
-            }
+        /* Skeleton loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
         }
-
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("DEBUG ERROR:", message, "at", source, ":", lineno);
-            window.DEBUG_STATE.errors.push(message);
-            updateDebugUI();
-        };
-
-        window.addEventListener('load', () => {
-            if (window.Babel) window.DEBUG_STATE.babelLoaded = true;
-            updateDebugUI();
-        });
-    </script>
-
-    <script type="importmap">
+        .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    </style>
+<script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@1.34.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/"
+    "react": "https://esm.sh/react@^19.2.3",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
   }
 }
 </script>
 </head>
-<body class="text-zinc-900 antialiased">
-    <!-- Debug Banner -->
-    <div id="debug-status">Initializing debug status...</div>
+<body class="antialiased">
+    <!-- Status Header -->
+    <div id="debug-status">
+        <span><b>SYSTEM:</b> Vanilla Engine Active ✅ | Last Update: <span id="last-update-time"></span></span>
+        <span>GitHub Pages Ready</span>
+    </div>
 
-    <div id="root"></div>
-    
-    <!-- 
-      Using Babel to compile the TSX files. 
-      The 'data-type="module"' attribute is critical for Babel to handle ES6 imports.
-    -->
-    <script 
-        type="text/babel" 
-        data-presets="typescript,react" 
-        data-type="module" 
-        src="./index.tsx"
-    ></script>
+    <div class="min-h-screen flex flex-col max-w-4xl mx-auto px-6 py-12">
+        <header class="flex flex-col items-center text-center mb-16">
+            <h1 onclick="navigateTo('list')" class="serif text-6xl md:text-8xl font-semibold tracking-tight cursor-pointer hover:text-zinc-600 transition-colors">
+                Elegance.
+            </h1>
+            <p class="text-zinc-500 text-sm mt-4 uppercase tracking-[0.2em] font-medium">מחשבות על עיצוב, קוד ורוח הזמן</p>
+            
+            <nav class="flex gap-12 mt-12 text-sm font-bold uppercase tracking-widest text-zinc-400">
+                <button onclick="navigateTo('list')" id="nav-list" class="hover:text-black transition-colors border-b-2 pb-1 border-transparent">מאמרים</button>
+                <button onclick="navigateTo('compose')" id="nav-compose" class="hover:text-black transition-colors border-b-2 pb-1 border-transparent">כתיבה</button>
+                <button class="hover:text-black transition-colors border-b-2 border-transparent pb-1">אודות</button>
+            </nav>
 
-    <script>updateDebugUI();</script>
+            <div id="search-container" class="w-full max-w-md mt-12 hidden">
+                <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="חפש במחשבות..." 
+                    class="w-full bg-zinc-100 border-none rounded-full px-8 py-4 text-center focus:ring-2 focus:ring-zinc-200 transition-all">
+            </div>
+        </header>
+
+        <main id="main-content" class="flex-grow">
+            <!-- List View -->
+            <section id="view-list" class="view-section animate-in fade-in duration-700">
+                <div id="posts-container" class="divide-y divide-zinc-100">
+                    <!-- Posts injected here -->
+                </div>
+            </section>
+
+            <!-- Detail View -->
+            <section id="view-detail" class="view-section animate-in fade-in duration-700">
+                <article id="post-detail-content" class="max-w-2xl mx-auto">
+                    <!-- Post content injected here -->
+                </article>
+                <div class="max-w-2xl mx-auto mt-20 pt-10 border-t border-zinc-100">
+                    <button onclick="navigateTo('list')" class="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-black flex items-center gap-2">
+                        <span>→</span> חזרה לרשימת המאמרים
+                    </button>
+                </div>
+            </section>
+
+            <!-- Compose View -->
+            <section id="view-compose" class="view-section animate-in fade-in duration-700">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-zinc-50 p-8 rounded-2xl mb-12 border border-zinc-100">
+                        <h3 class="serif text-xl font-medium mb-2">עוזר כתיבה AI</h3>
+                        <p class="text-sm text-zinc-500 mb-6">תן לי נושא, ואני אכתוב עבורך טיוטה אלגנטית.</p>
+                        <div class="flex gap-3">
+                            <input type="text" id="ai-prompt" placeholder="למשל: על החשיבות של פשטות בחיים המודרניים..." 
+                                class="flex-grow bg-white rounded-xl px-4 py-3 text-sm border border-zinc-200 focus:outline-none">
+                            <button id="ai-btn" onclick="generateWithAI()" class="bg-black text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors">
+                                צור טיוטה
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <input type="text" id="editor-title" placeholder="כותרת המאמר" 
+                            class="w-full serif text-4xl md:text-5xl font-medium bg-transparent border-none focus:ring-0 placeholder-zinc-200">
+                        
+                        <textarea id="editor-excerpt" placeholder="תקציר קצר..." rows="2"
+                            class="w-full text-lg text-zinc-500 bg-transparent border-none focus:ring-0 resize-none"></textarea>
+                        
+                        <textarea id="editor-content" placeholder="התחל לכתוב כאן... (תומך ב-HTML)" rows="15"
+                            class="w-full text-lg leading-relaxed bg-transparent border-none focus:ring-0 resize-none"></textarea>
+
+                        <div class="pt-10">
+                            <button onclick="savePost()" class="bg-black text-white px-12 py-4 rounded-full text-sm font-bold uppercase tracking-[0.2em] hover:scale-105 transition-transform shadow-xl">
+                                פרסם עכשיו
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="mt-32 pt-12 border-t border-zinc-100 pb-12 text-zinc-400 text-xs flex justify-between items-center">
+            <p>&copy; 2024 Elegance. נבנה עבור הדור הבא של הכותבים.</p>
+            <div class="flex gap-8 font-bold uppercase tracking-widest">
+                <a href="#" class="hover:text-black transition-colors">Twitter</a>
+                <a href="#" class="hover:text-black transition-colors">RSS</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { GoogleGenAI, Type } from "@google/genai";
+
+        // --- State Management ---
+        let posts = [
+            {
+                id: '1',
+                title: 'האסתטיקה של השקט',
+                excerpt: 'כיצד עיצוב מינימליסטי משפיע על היכולת שלנו לחשוב לעומק בעולם מלא ברעש דיגיטלי.',
+                content: '<h2>המרחב שבין הדברים</h2><p>בעולם של היום, אנחנו מוצפים במידע. המינימליזם הוא לא רק בחירה עיצובית, הוא אקט של התנגדות. כשאנחנו מפנים מקום על המסך, אנחנו מפנים מקום בראש.</p><blockquote>פחות זה יותר, אבל רק אם הפחות הוא מדויק.</blockquote><p>האלגנטיות האמיתית נובעת מהבנה של מה באמת נחוץ.</p>',
+                date: '12 במאי 2024',
+                category: 'עיצוב'
+            },
+            {
+                id: '2',
+                title: 'למה אנחנו כותבים?',
+                excerpt: 'על הצורך האנושי הבסיסי לתעד, לשתף ולייצר משמעות דרך מילים במרחב הווירטואלי.',
+                content: '<p>כתיבה היא תהליך של גילוי. אנחנו לא כותבים כדי לומר את מה שאנחנו יודעים, אלא כדי לגלות מה אנחנו חושבים.</p>',
+                date: '8 במאי 2024',
+                category: 'מחשבות'
+            }
+        ];
+
+        // --- Navigation Logic ---
+        window.navigateTo = function(view, postId = null) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            
+            // Update Navigation Buttons
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-black', 'border-black'));
+            const activeNav = document.getElementById(`nav-${view}`);
+            if (activeNav) activeNav.classList.add('text-black', 'border-black');
+
+            // Search visibility
+            document.getElementById('search-container').classList.toggle('hidden', view !== 'list');
+
+            if (view === 'list') renderPosts(posts);
+            if (view === 'detail' && postId) renderDetail(postId);
+            
+            window.scrollTo(0, 0);
+        };
+
+        // --- Rendering Logic ---
+        function renderPosts(data) {
+            const container = document.getElementById('posts-container');
+            container.innerHTML = data.map(post => `
+                <article onclick="navigateTo('detail', '${post.id}')" class="group cursor-pointer py-12 first:pt-0">
+                    <div class="flex justify-between items-baseline mb-4">
+                        <h2 class="serif text-3xl md:text-4xl font-medium group-hover:text-zinc-500 transition-colors">${post.title}</h2>
+                        <time class="text-zinc-400 text-xs font-bold uppercase tracking-widest">${post.date}</time>
+                    </div>
+                    <p class="text-zinc-500 text-lg leading-relaxed max-w-2xl mb-6">${post.excerpt}</p>
+                    <span class="text-xs font-bold uppercase tracking-widest text-zinc-300 group-hover:text-zinc-900 transition-colors">${post.category}</span>
+                </article>
+            `).join('');
+        }
+
+        function renderDetail(id) {
+            const post = posts.find(p => p.id === id);
+            if (!post) return;
+            const container = document.getElementById('post-detail-content');
+            container.innerHTML = `
+                <header class="mb-16">
+                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-6">${post.category} • ${post.date}</div>
+                    <h1 class="serif text-5xl md:text-7xl font-medium leading-[1.1] mb-8">${post.title}</h1>
+                    <p class="text-2xl text-zinc-500 font-light italic pr-6 border-r-2 border-zinc-100">${post.excerpt}</p>
+                </header>
+                <div class="prose max-w-none">${post.content}</div>
+            `;
+        }
+
+        window.handleSearch = function(query) {
+            const filtered = posts.filter(p => 
+                p.title.includes(query) || p.excerpt.includes(query) || p.content.includes(query)
+            );
+            renderPosts(filtered);
+        };
+
+        // --- AI & Editor Logic ---
+        window.generateWithAI = async function() {
+            const prompt = document.getElementById('ai-prompt').value;
+            const btn = document.getElementById('ai-btn');
+            if (!prompt) return;
+
+            const apiKey = window.process.env.API_KEY;
+            if (!apiKey) {
+                alert("מפתח API חסר. אנא וודא שהסביבה מוגדרת כראוי.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = 'מנסח...';
+
+            try {
+                const ai = new GoogleGenAI({ apiKey });
+                const response = await ai.models.generateContent({
+                    model: 'gemini-3-flash-preview',
+                    contents: `Generate a blog post in Hebrew about: ${prompt}. Return a JSON object with title, content (HTML), and excerpt.`,
+                    config: {
+                        responseMimeType: 'application/json',
+                        responseSchema: {
+                            type: Type.OBJECT,
+                            properties: {
+                                title: { type: Type.STRING },
+                                content: { type: Type.STRING },
+                                excerpt: { type: Type.STRING }
+                            },
+                            required: ['title', 'content', 'excerpt']
+                        }
+                    }
+                });
+
+                const data = JSON.parse(response.text);
+                document.getElementById('editor-title').value = data.title;
+                document.getElementById('editor-excerpt').value = data.excerpt;
+                document.getElementById('editor-content').value = data.content;
+                document.getElementById('ai-prompt').value = '';
+            } catch (err) {
+                console.error(err);
+                alert("שגיאה בתקשורת עם ה-AI.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'צור טיוטה';
+            }
+        };
+
+        window.savePost = function() {
+            const title = document.getElementById('editor-title').value;
+            const excerpt = document.getElementById('editor-excerpt').value;
+            const content = document.getElementById('editor-content').value;
+
+            if (!title || !content) {
+                alert("אנא מלא כותרת ותוכן.");
+                return;
+            }
+
+            const newPost = {
+                id: Date.now().toString(),
+                title, excerpt, content,
+                category: 'חדש',
+                date: new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })
+            };
+
+            posts = [newPost, ...posts];
+            navigateTo('list');
+            
+            // Reset editor
+            document.getElementById('editor-title').value = '';
+            document.getElementById('editor-excerpt').value = '';
+            document.getElementById('editor-content').value = '';
+        };
+
+        // --- Initialization ---
+        document.getElementById('last-update-time').innerText = new Date().toLocaleTimeString();
+        navigateTo('list');
+
+    </script>
 </body>
 </html>
