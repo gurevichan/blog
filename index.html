@@ -9,7 +9,7 @@
     <!-- Tailwind for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Babel Standalone: This allows the browser to run .tsx files directly -->
+    <!-- Babel Standalone: Essential for running .tsx directly in browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,16 +36,59 @@
         .prose {
             text-align: right;
         }
+        /* Debug Banner Styles */
+        #debug-status {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: #fef3c7;
+            color: #92400e;
+            font-family: monospace;
+            font-size: 10px;
+            padding: 4px 10px;
+            z-index: 9999;
+            border-bottom: 1px solid #f59e0b;
+            display: flex;
+            justify-content: space-between;
+            direction: ltr; /* Force LTR for debug info */
+        }
     </style>
 
     <script>
-        // Shim for process.env to prevent crashes on static hosts like GitHub Pages
+        // Initialize process shim
         window.process = { env: { API_KEY: "" } };
         
-        // Error logging for debugging on production
-        window.onerror = function(message, source, lineno, colno, error) {
-            console.error("Global Error Caught:", message, "at", source, ":", lineno);
+        // Debugging state
+        window.DEBUG_STATE = {
+            htmlLoaded: new Date().toLocaleTimeString(),
+            babelLoaded: false,
+            appStarted: false,
+            errors: []
         };
+
+        function updateDebugUI() {
+            const el = document.getElementById('debug-status');
+            if (el) {
+                el.innerHTML = `
+                    <span><b>STATUS:</b> HTML: ${window.DEBUG_STATE.htmlLoaded} | 
+                    Babel: ${window.DEBUG_STATE.babelLoaded ? '✅' : '⏳'} | 
+                    App: ${window.DEBUG_STATE.appStarted ? '✅' : '⏳'}</span>
+                    <span>${window.DEBUG_STATE.errors.length > 0 ? '❌ Errors in Console' : 'No Errors detected'}</span>
+                `;
+            }
+        }
+
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error("DEBUG ERROR:", message, "at", source, ":", lineno);
+            window.DEBUG_STATE.errors.push(message);
+            updateDebugUI();
+        };
+
+        window.addEventListener('load', () => {
+            if (window.Babel) window.DEBUG_STATE.babelLoaded = true;
+            updateDebugUI();
+        });
     </script>
 
     <script type="importmap">
@@ -62,12 +105,14 @@
 </script>
 </head>
 <body class="text-zinc-900 antialiased">
+    <!-- Debug Banner -->
+    <div id="debug-status">Initializing debug status...</div>
+
     <div id="root"></div>
     
     <!-- 
-      We use text/babel here to tell Babel to transpile this script. 
-      data-type="module" allows us to use ES6 imports with our importmap.
-      data-presets="typescript,react" tells Babel which languages to support.
+      Using Babel to compile the TSX files. 
+      The 'data-type="module"' attribute is critical for Babel to handle ES6 imports.
     -->
     <script 
         type="text/babel" 
@@ -75,5 +120,7 @@
         data-type="module" 
         src="./index.tsx"
     ></script>
+
+    <script>updateDebugUI();</script>
 </body>
 </html>
