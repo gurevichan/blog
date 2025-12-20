@@ -1,10 +1,10 @@
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Post, AppView } from './types';
-import { INITIAL_POSTS } from './constants';
-import Layout from './components/Layout';
-import PostCard from './components/PostCard';
-import Editor from './components/Editor';
+import { Post, AppView } from './types.ts';
+import { INITIAL_POSTS } from './constants.ts';
+import Layout from './components/Layout.tsx';
+import PostCard from './components/PostCard.tsx';
+import Editor from './components/Editor.tsx';
 
 const App: React.FC = () => {
   const [view, setView] = useState<AppView>('list');

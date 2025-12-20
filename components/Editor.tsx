@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { gemini } from '../services/geminiService';
+import { gemini } from '../services/geminiService.ts';
 
 interface EditorProps {
   onSave: (data: { title: string; content: string; excerpt: string; category: string }) => void;
