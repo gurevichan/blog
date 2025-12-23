@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elegance - בלוג עיצוב וטכנולוגיה</title>
+    <title>Elegance - Editorial CMS</title>
     
-    <!-- Tailwind for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,253 +13,543 @@
     
     <style>
         :root {
-            --bg-color: #fcfcfc;
-            --text-main: #18181b;
-            --text-muted: #71717a;
+            --bg-linen: #f2ece0;
+            --text-main: #2c2c2c;
+            --dynamic-accent: #2c3e50; /* Indigo Slate Default */
+            --accent-ochre: #d4a017;
+            --moss-green: #3e4e3e;
         }
+        
         body {
             font-family: 'Assistant', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-linen);
             color: var(--text-main);
-            transition: opacity 0.3s ease;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 20px 20px;
+            transition: background-color 0.5s ease;
         }
+        
         .serif {
             font-family: 'Frank Ruhl Libre', serif;
         }
-        .prose h2 { font-family: 'Frank Ruhl Libre', serif; font-size: 1.875rem; font-weight: 500; margin-top: 2rem; margin-bottom: 1rem; }
-        .prose p { line-height: 1.8; margin-bottom: 1.5rem; font-size: 1.125rem; }
-        .prose blockquote {
-            border-right: 4px solid #e5e7eb;
-            padding-right: 1.5rem;
-            margin: 2rem 0;
-            font-style: italic;
-            color: #4b5563;
+        
+        /* Main Title Animation */
+        .brand-title {
+            color: var(--dynamic-accent);
+            text-shadow: 2px 2px 0px rgba(212, 160, 23, 0.1);
+            transition: color 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        /* Post Styling */
+        .prose h2 { 
+            font-family: 'Frank Ruhl Libre', serif; 
+            font-size: 2.5rem; 
+            font-weight: 600; 
+            margin-top: 3rem; 
+            margin-bottom: 1.5rem; 
+            color: var(--dynamic-accent);
+            border-bottom: 2px solid var(--accent-ochre);
+            display: inline-block;
+            transition: color 0.8s ease;
+        }
+        
+        .prose p { line-height: 2; margin-bottom: 2rem; font-size: 1.3rem; color: #333; }
+        
+        /* Drop Cap */
+        .prose p:first-of-type::first-letter {
+            float: right;
+            font-family: 'Frank Ruhl Libre', serif;
+            font-size: 5rem;
+            line-height: 1;
+            padding: 0.5rem 0 0.5rem 1rem;
+            color: var(--dynamic-accent);
+            font-weight: 700;
+            transition: color 0.8s ease;
+        }
+
+        .prose blockquote {
+            border-right: 6px solid var(--dynamic-accent);
+            padding: 1.5rem 2.5rem;
+            margin: 3.5rem 0;
+            font-style: italic;
+            color: var(--dynamic-accent);
+            font-size: 1.75rem;
+            background: rgba(0, 0, 0, 0.02);
+            font-family: 'Frank Ruhl Libre', serif;
+            transition: all 0.8s ease;
+        }
+
+        /* UI Elements */
         #debug-status {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            background: #ecfdf5;
-            color: #065f46;
+            background: #1e272e;
+            color: #e0e0e0;
             font-family: monospace;
-            font-size: 10px;
-            padding: 4px 10px;
-            z-index: 9999;
-            border-bottom: 1px solid #10b981;
+            font-size: 11px;
+            padding: 6px 15px;
+            z-index: 100;
+            border-bottom: 2px solid var(--dynamic-accent);
             display: flex;
             justify-content: space-between;
             direction: ltr;
         }
+        
+        .publish-btn {
+            background: var(--dynamic-accent);
+            color: #fff;
+            transition: all 0.4s;
+        }
+        
+        #reading-progress {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 4px;
+            background: var(--dynamic-accent);
+            z-index: 110;
+            width: 0%;
+            transition: background-color 0.8s ease;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            right: 0;
+            width: 0%;
+            height: 2px;
+            background: var(--dynamic-accent);
+            transition: width 0.3s, background-color 0.8s;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .color-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        .color-dot:hover {
+            transform: scale(1.3);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .color-dot.active {
+            border: 2px solid white;
+            box-shadow: 0 0 0 2px var(--text-main);
+        }
+
         .view-section { display: none; }
         .view-section.active { display: block; }
-        
-        /* Skeleton loading animation */
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-        .loading-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+
+        ::selection { background: var(--dynamic-accent); color: white; }
     </style>
-<script type="importmap">
+    
+    <script type="importmap">
 {
   "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@1.34.0",
     "react": "https://esm.sh/react@^19.2.3",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
+    "react/": "https://esm.sh/react@^19.2.3/"
   }
 }
 </script>
 </head>
 <body class="antialiased">
-    <!-- Status Header -->
+    <div id="reading-progress"></div>
+
     <div id="debug-status">
-        <span><b>SYSTEM:</b> Vanilla Engine Active ✅ | Last Update: <span id="last-update-time"></span></span>
-        <span>GitHub Pages Ready</span>
+        <span><b>SYSTEM:</b> Custom Palettes Active ✅ | Sync: <span id="last-update-time">--:--</span></span>
+        <span>Live Colors (🎨)</span>
     </div>
 
-    <div class="min-h-screen flex flex-col max-w-4xl mx-auto px-6 py-12">
-        <header class="flex flex-col items-center text-center mb-16">
-            <h1 onclick="navigateTo('list')" class="serif text-6xl md:text-8xl font-semibold tracking-tight cursor-pointer hover:text-zinc-600 transition-colors">
+    <div class="min-h-screen flex flex-col max-w-5xl mx-auto px-6 py-24">
+        <header class="flex flex-col items-center text-center mb-28">
+            <!-- Palette Selector -->
+            <div class="flex gap-3 mb-12 p-2 bg-white/40 rounded-full border border-white/60 shadow-sm">
+                <div onclick="setAccent('#2c3e50', this)" class="color-dot active" style="background: #2c3e50;" title="Slate"></div>
+                <div onclick="setAccent('#1b3022', this)" class="color-dot" style="background: #1b3022;" title="Forest"></div>
+                <div onclick="setAccent('#6d214f', this)" class="color-dot" style="background: #6d214f;" title="Mulberry"></div>
+                <div onclick="setAccent('#227093', this)" class="color-dot" style="background: #227093;" title="Deep Sea"></div>
+                <div onclick="setAccent('#3e4e3e', this)" class="color-dot" style="background: #3e4e3e;" title="Moss"></div>
+                <div onclick="setAccent('#d35400', this)" class="color-dot" style="background: #d35400;" title="Burnt Orange"></div>
+                <div onclick="setAccent('#4b4b4b', this)" class="color-dot" style="background: #4b4b4b;" title="Espresso"></div>
+                <div onclick="setAccent('#586730', this)" class="color-dot" style="background: #586730;" title="Olive"></div>
+                <div onclick="setAccent('#30336b', this)" class="color-dot" style="background: #30336b;" title="Indigo"></div>
+                <div onclick="setAccent('#9b6b6b', this)" class="color-dot" style="background: #9b6b6b;" title="Dusty Rose"></div>
+            </div>
+
+            <h1 onclick="navigateTo('list')" class="serif brand-title text-8xl md:text-[10rem] font-bold tracking-tighter cursor-pointer">
                 Elegance.
             </h1>
-            <p class="text-zinc-500 text-sm mt-4 uppercase tracking-[0.2em] font-medium">מחשבות על עיצוב, קוד ורוח הזמן</p>
+            <div class="h-1 w-32 bg-[var(--accent-ochre)] mt-12 mb-6"></div>
+            <p class="text-zinc-600 text-sm uppercase tracking-[0.4em] font-black">Curated Thoughts • Live Palettes • Modern Life</p>
             
-            <nav class="flex gap-12 mt-12 text-sm font-bold uppercase tracking-widest text-zinc-400">
-                <button onclick="navigateTo('list')" id="nav-list" class="hover:text-black transition-colors border-b-2 pb-1 border-transparent">מאמרים</button>
-                <button onclick="navigateTo('compose')" id="nav-compose" class="hover:text-black transition-colors border-b-2 pb-1 border-transparent">כתיבה</button>
-                <button class="hover:text-black transition-colors border-b-2 border-transparent pb-1">אודות</button>
+            <nav class="flex gap-16 mt-20 text-[11px] font-black uppercase tracking-[0.25em] text-zinc-400">
+                <button onclick="navigateTo('list')" id="nav-list" class="nav-link hover:text-[var(--text-main)]">הארכיון</button>
+                <button onclick="openEditor()" id="nav-compose" class="nav-link hover:text-[var(--text-main)]">כתוב משהו</button>
+                <button onclick="toggleSettings()" class="nav-link hover:text-[var(--text-main)]">סנכרון</button>
             </nav>
 
-            <div id="search-container" class="w-full max-w-md mt-12 hidden">
-                <input type="text" id="search-input" oninput="handleSearch(this.value)" placeholder="חפש במחשבות..." 
-                    class="w-full bg-zinc-100 border-none rounded-full px-8 py-4 text-center focus:ring-2 focus:ring-zinc-200 transition-all">
+            <div id="publish-container" class="mt-12 hidden">
+                <button onclick="publishToGithub()" id="global-publish-btn" class="publish-btn px-10 py-4 rounded-full text-xs font-black uppercase tracking-[0.2em]">
+                    פרסם שינויים לענן
+                </button>
             </div>
         </header>
 
         <main id="main-content" class="flex-grow">
             <!-- List View -->
-            <section id="view-list" class="view-section animate-in fade-in duration-700">
-                <div id="posts-container" class="divide-y divide-zinc-100">
-                    <!-- Posts injected here -->
-                </div>
+            <section id="view-list" class="view-section active">
+                <div id="posts-container" class="grid grid-cols-1 gap-12"></div>
             </section>
 
             <!-- Detail View -->
-            <section id="view-detail" class="view-section animate-in fade-in duration-700">
-                <article id="post-detail-content" class="max-w-2xl mx-auto">
-                    <!-- Post content injected here -->
-                </article>
-                <div class="max-w-2xl mx-auto mt-20 pt-10 border-t border-zinc-100">
-                    <button onclick="navigateTo('list')" class="text-sm font-bold uppercase tracking-widest text-zinc-400 hover:text-black flex items-center gap-2">
-                        <span>→</span> חזרה לרשימת המאמרים
-                    </button>
+            <section id="view-detail" class="view-section">
+                <div class="flex justify-between items-center mb-20 border-b-2 border-zinc-200 pb-8">
+                    <button onclick="navigateTo('list')" class="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-black">← חזרה</button>
+                    <div class="flex gap-8">
+                        <button id="edit-post-btn" class="text-xs font-black uppercase tracking-widest text-zinc-400 hover:text-[var(--dynamic-accent)]">ערוך</button>
+                        <button id="delete-post-btn" class="text-xs font-black uppercase tracking-widest text-red-300 hover:text-red-700">מחק</button>
+                    </div>
                 </div>
+                <article id="post-detail-content" class="max-w-3xl mx-auto"></article>
             </section>
 
-            <!-- Compose View -->
-            <section id="view-compose" class="view-section animate-in fade-in duration-700">
-                <div class="max-w-2xl mx-auto">
-                    <div class="bg-zinc-50 p-8 rounded-2xl mb-12 border border-zinc-100">
-                        <h3 class="serif text-xl font-medium mb-2">עוזר כתיבה AI</h3>
-                        <p class="text-sm text-zinc-500 mb-6">תן לי נושא, ואני אכתוב עבורך טיוטה אלגנטית.</p>
-                        <div class="flex gap-3">
-                            <input type="text" id="ai-prompt" placeholder="למשל: על החשיבות של פשטות בחיים המודרניים..." 
-                                class="flex-grow bg-white rounded-xl px-4 py-3 text-sm border border-zinc-200 focus:outline-none">
-                            <button id="ai-btn" onclick="generateWithAI()" class="bg-black text-white px-6 py-3 rounded-xl text-sm font-bold hover:bg-zinc-800 transition-colors">
-                                צור טיוטה
-                            </button>
+            <!-- Editor View -->
+            <section id="view-editor" class="view-section">
+                <div class="max-w-3xl mx-auto">
+                    <div class="bg-white/50 p-10 rounded-3xl mb-16 border-2 border-dashed border-zinc-300">
+                        <h3 class="serif text-2xl font-bold mb-6 text-[var(--dynamic-accent)]">עוזר יצירתי AI</h3>
+                        <div class="flex gap-4">
+                            <input type="text" id="ai-prompt" placeholder="נושא למאמר הבא שלך..." class="flex-grow bg-white border-2 border-zinc-200 rounded-2xl px-6 py-4 text-sm focus:border-[var(--dynamic-accent)] outline-none transition-all">
+                            <button onclick="generateWithAI()" id="ai-btn" class="bg-[var(--dynamic-accent)] text-white px-8 py-4 rounded-2xl text-xs font-black uppercase hover:opacity-80 transition-all">צור</button>
                         </div>
                     </div>
-
-                    <div class="space-y-8">
-                        <input type="text" id="editor-title" placeholder="כותרת המאמר" 
-                            class="w-full serif text-4xl md:text-5xl font-medium bg-transparent border-none focus:ring-0 placeholder-zinc-200">
+                    <div class="space-y-12">
+                        <input type="text" id="edit-title" placeholder="כותרת עוצמתית" class="w-full serif text-6xl font-bold bg-transparent border-none focus:ring-0 placeholder-zinc-300 text-[var(--dynamic-accent)]">
+                        <input type="text" id="edit-category" placeholder="קטגוריה" class="w-full text-sm font-black uppercase tracking-widest border-b-2 border-zinc-200 bg-transparent focus:border-[var(--accent-ochre)] outline-none py-4 text-[var(--accent-ochre)]">
+                        <textarea id="edit-excerpt" placeholder="תקציר מושך..." rows="3" class="w-full text-2xl text-zinc-500 bg-transparent border-none focus:ring-0 resize-none italic font-light"></textarea>
+                        <textarea id="edit-content" placeholder="הסיפור שלך מתחיל כאן..." rows="15" class="w-full text-xl leading-relaxed bg-white/40 border-2 border-zinc-100 rounded-3xl p-8 focus:bg-white focus:ring-0 transition-all"></textarea>
                         
-                        <textarea id="editor-excerpt" placeholder="תקציר קצר..." rows="2"
-                            class="w-full text-lg text-zinc-500 bg-transparent border-none focus:ring-0 resize-none"></textarea>
-                        
-                        <textarea id="editor-content" placeholder="התחל לכתוב כאן... (תומך ב-HTML)" rows="15"
-                            class="w-full text-lg leading-relaxed bg-transparent border-none focus:ring-0 resize-none"></textarea>
-
-                        <div class="pt-10">
-                            <button onclick="savePost()" class="bg-black text-white px-12 py-4 rounded-full text-sm font-bold uppercase tracking-[0.2em] hover:scale-105 transition-transform shadow-xl">
-                                פרסם עכשיו
-                            </button>
+                        <div class="pt-10 flex gap-6">
+                            <button onclick="saveChanges()" class="bg-[var(--dynamic-accent)] text-white px-16 py-6 rounded-full text-xs font-black uppercase tracking-[0.2em] hover:scale-105 transition-all shadow-xl">שמור מאמר</button>
+                            <button onclick="navigateTo('list')" class="px-12 py-6 rounded-full text-xs font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-black">ביטול</button>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <footer class="mt-32 pt-12 border-t border-zinc-100 pb-12 text-zinc-400 text-xs flex justify-between items-center">
-            <p>&copy; 2024 Elegance. נבנה עבור הדור הבא של הכותבים.</p>
-            <div class="flex gap-8 font-bold uppercase tracking-widest">
-                <a href="#" class="hover:text-black transition-colors">Twitter</a>
-                <a href="#" class="hover:text-black transition-colors">RSS</a>
+        <!-- Settings -->
+        <div id="settings-modal" class="fixed inset-0 bg-[var(--bg-linen)]/95 z-[200] hidden flex items-center justify-center p-8 backdrop-blur-md">
+            <div class="max-w-md w-full space-y-12 bg-white p-12 rounded-[3rem] shadow-2xl">
+                <div class="text-center">
+                    <h2 class="serif text-4xl font-bold text-[var(--dynamic-accent)]">הגדרות סנכרון</h2>
+                </div>
+                <div class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Personal Token</label>
+                        <input type="password" id="gh-token" class="w-full border-2 border-zinc-100 rounded-2xl p-4 text-sm focus:border-[var(--accent-ochre)] outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Username</label>
+                            <input type="text" id="gh-owner" class="w-full border-2 border-zinc-100 rounded-2xl p-4 text-sm outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black uppercase tracking-widest text-zinc-400">Repo Name</label>
+                            <input type="text" id="gh-repo" class="w-full border-2 border-zinc-100 rounded-2xl p-4 text-sm outline-none">
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="saveSettings()" class="flex-grow bg-[var(--dynamic-accent)] text-white py-5 rounded-2xl text-xs font-black uppercase tracking-widest hover:opacity-80">שמור</button>
+                    <button onclick="toggleSettings()" class="flex-grow bg-zinc-100 py-5 rounded-2xl text-xs font-black uppercase tracking-widest">סגור</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-48 pt-20 border-t-2 border-zinc-200 pb-24 text-zinc-400 text-[11px] font-black uppercase tracking-[0.4em] flex flex-col md:flex-row justify-between items-center">
+            <p>&copy; 2024 Elegance Editorial CMS. Created for the bold.</p>
+            <div class="flex gap-12 mt-8 md:mt-0">
+                <a href="#" class="hover:text-[var(--dynamic-accent)] transition-colors">Archive</a>
+                <a href="#" class="hover:text-[var(--dynamic-accent)] transition-colors">Instagram</a>
+                <a href="#" class="hover:text-[var(--dynamic-accent)] transition-colors">Colophon</a>
             </div>
         </footer>
     </div>
 
-    <!-- Scripts -->
     <script type="module">
         import { GoogleGenAI, Type } from "@google/genai";
 
-        // --- State Management ---
+        // --- PALETTE LOGIC ---
+        window.setAccent = (color, el) => {
+            document.documentElement.style.setProperty('--dynamic-accent', color);
+            document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+            el.classList.add('active');
+            localStorage.setItem('blog_accent', color);
+        };
+
+        // Initialize saved color
+        const savedColor = localStorage.getItem('blog_accent');
+        if (savedColor) {
+            document.documentElement.style.setProperty('--dynamic-accent', savedColor);
+            setTimeout(() => {
+                const dots = document.querySelectorAll('.color-dot');
+                dots.forEach(d => {
+                    if (d.style.backgroundColor === savedColor || d.getAttribute('style').includes(savedColor)) {
+                        d.classList.add('active');
+                    } else {
+                        d.classList.remove('active');
+                    }
+                });
+            }, 100);
+        }
+
+        // --- DATA ---
         let posts = [
             {
                 id: '1',
-                title: 'האסתטיקה של השקט',
-                excerpt: 'כיצד עיצוב מינימליסטי משפיע על היכולת שלנו לחשוב לעומק בעולם מלא ברעש דיגיטלי.',
-                content: '<h2>המרחב שבין הדברים</h2><p>בעולם של היום, אנחנו מוצפים במידע. המינימליזם הוא לא רק בחירה עיצובית, הוא אקט של התנגדות. כשאנחנו מפנים מקום על המסך, אנחנו מפנים מקום בראש.</p><blockquote>פחות זה יותר, אבל רק אם הפחות הוא מדויק.</blockquote><p>האלגנטיות האמיתית נובעת מהבנה של מה באמת נחוץ.</p>',
-                date: '12 במאי 2024',
-                category: 'עיצוב'
+                title: 'החיים בקצביות של חום וצבע',
+                excerpt: 'כיצד שימוש נכון בפלטת צבעים חמה משפיע על מצב הרוח והפרודוקטיביות שלנו במרחב המגורים.',
+                content: '<h2>הכוח של הצבע במרחב</h2><p>צבע אינו רק עניין של אסתטיקה. הוא שפה שפועלת על התת-מודע שלנו. כשאנחנו בוחרים בגווני אדמה, אנחנו מחברים את הבית שלנו לשורשים עתיקים. זהו צבע שמשדר ביטחון, יציבות וחום אנושי.</p><blockquote>הצבע הוא המקום שבו המוח שלנו והיקום נפגשים.</blockquote><p>במחקרים על עיצוב פנים נמצא כי מרחבים המשלבים גוונים טבעיים מעודדים שיחה פתוחה יותר וריכוז מוגבר. זהו לא טרנד חולף, אלא חזרה לאלמנטים בסיסיים.</p>',
+                date: '20 יוני 2024',
+                category: 'לייף סטייל'
             },
             {
                 id: '2',
-                title: 'למה אנחנו כותבים?',
-                excerpt: 'על הצורך האנושי הבסיסי לתעד, לשתף ולייצר משמעות דרך מילים במרחב הווירטואלי.',
-                content: '<p>כתיבה היא תהליך של גילוי. אנחנו לא כותבים כדי לומר את מה שאנחנו יודעים, אלא כדי לגלות מה אנחנו חושבים.</p>',
-                date: '8 במאי 2024',
-                category: 'מחשבות'
+                title: 'ארכיטקטורה של מילים',
+                excerpt: 'כתיבה היא כמו בנייה: עלינו להבטיח שהיסודות חזקים מספיק לפני שאנחנו מעטרים את הגג.',
+                content: '<h2>לבנות משפט, לבנות בית</h2><p>סופר טוב הוא בראש ובראשונה אדריכל. המבנה של הפסקה הוא השלד שמחזיק את הרעיון. ללא מבנה לוגי ברור, המילים היפות ביותר יקרסו תחת משקלן.</p><p>בעולם הדיגיטלי, המבנה הופך לחשוב עוד יותר. הקורא המודרני סורק את הטקסט, ומחפש עוגנים ויזואליים ורעיוניים.</p>',
+                date: '18 יוני 2024',
+                category: 'כתיבה'
+            },
+            {
+                id: '3',
+                title: 'העיר כקנבס אינסופי',
+                excerpt: 'מגרפיטי ועד תכנון עירוני - כיצד המרחב הציבורי הופך ליצירת אמנות משותפת לכולנו.',
+                content: '<h2>ללכת לאיבוד בכוונה</h2><p>העיר הגדולה היא לא רק מקום מגורים, היא גוף חי ונושם. כל פינת רחוב מספרת סיפור אחר. מי שמשכיל להתבונן בפרטים הקטנים - בטקסטורה של הבטון, בצבע המתקלף של הדלתות - מגלה עולם ומלואו.</p>',
+                date: '15 יוני 2024',
+                category: 'תרבות'
+            },
+            {
+                id: '4',
+                title: 'פשטות היא התחכום האולטימטיבי',
+                excerpt: 'על הקסם שבדיוק המינימליסטי ועל היכולת לומר הרבה בפחות.',
+                content: '<h2>פחות אבל טוב יותר</h2><p>המימרה המפורסמת של דיטר ראמס רלוונטית היום יותר מתמיד. בעידן של עומס קוגניטיבי, הפשטות היא מתנה. היא מאפשרת לנו להתמקד במה שחשוב באמת.</p>',
+                date: '10 יוני 2024',
+                category: 'עיצוב'
             }
         ];
 
-        // --- Navigation Logic ---
-        window.navigateTo = function(view, postId = null) {
+        let hasChanges = false;
+        let currentEditingId = null;
+
+        // --- Scrolling ---
+        window.onscroll = () => {
+            let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = (winScroll / height) * 100;
+            document.getElementById("reading-progress").style.width = scrolled + "%";
+        };
+
+        // --- Navigation ---
+        window.navigateTo = (view, postId = null) => {
             document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`view-${view}`).classList.add('active');
             
-            // Update Navigation Buttons
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-black', 'border-black'));
+            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active', 'text-[var(--text-main)]'));
             const activeNav = document.getElementById(`nav-${view}`);
-            if (activeNav) activeNav.classList.add('text-black', 'border-black');
+            if (activeNav) activeNav.classList.add('active', 'text-[var(--text-main)]');
 
-            // Search visibility
-            document.getElementById('search-container').classList.toggle('hidden', view !== 'list');
-
-            if (view === 'list') renderPosts(posts);
-            if (view === 'detail' && postId) renderDetail(postId);
-            
-            window.scrollTo(0, 0);
+            if (view === 'list') renderPosts();
+            if (view === 'detail') renderDetail(postId);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // --- Rendering Logic ---
-        function renderPosts(data) {
+        // --- Rendering ---
+        function renderPosts() {
             const container = document.getElementById('posts-container');
-            container.innerHTML = data.map(post => `
-                <article onclick="navigateTo('detail', '${post.id}')" class="group cursor-pointer py-12 first:pt-0">
-                    <div class="flex justify-between items-baseline mb-4">
-                        <h2 class="serif text-3xl md:text-4xl font-medium group-hover:text-zinc-500 transition-colors">${post.title}</h2>
-                        <time class="text-zinc-400 text-xs font-bold uppercase tracking-widest">${post.date}</time>
+            container.innerHTML = posts.map(post => `
+                <article onclick="navigateTo('detail', '${post.id}')" class="group cursor-pointer py-16 first:pt-0 border-b border-zinc-200 last:border-0 hover:bg-white/20 px-4 transition-all duration-500 rounded-3xl">
+                    <div class="flex flex-col md:flex-row justify-between items-baseline mb-8 gap-6">
+                        <h2 class="serif text-4xl md:text-6xl font-bold group-hover:text-[var(--dynamic-accent)] transition-colors duration-500 leading-tight">${post.title}</h2>
+                        <time class="text-zinc-400 text-[10px] font-black uppercase tracking-[0.4em] shrink-0">${post.date}</time>
                     </div>
-                    <p class="text-zinc-500 text-lg leading-relaxed max-w-2xl mb-6">${post.excerpt}</p>
-                    <span class="text-xs font-bold uppercase tracking-widest text-zinc-300 group-hover:text-zinc-900 transition-colors">${post.category}</span>
+                    <p class="text-zinc-500 text-2xl leading-relaxed max-w-3xl mb-10 font-light">${post.excerpt}</p>
+                    <div class="flex items-center gap-6">
+                        <span class="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--accent-ochre)] bg-[var(--accent-ochre)]/10 px-4 py-2 rounded-full">${post.category}</span>
+                        <span class="text-[10px] font-black text-zinc-300 uppercase tracking-widest group-hover:text-[var(--text-main)] transition-colors">גלה עוד •</span>
+                    </div>
                 </article>
             `).join('');
+            updatePublishUI();
         }
 
         function renderDetail(id) {
             const post = posts.find(p => p.id === id);
-            if (!post) return;
-            const container = document.getElementById('post-detail-content');
-            container.innerHTML = `
-                <header class="mb-16">
-                    <div class="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 mb-6">${post.category} • ${post.date}</div>
-                    <h1 class="serif text-5xl md:text-7xl font-medium leading-[1.1] mb-8">${post.title}</h1>
-                    <p class="text-2xl text-zinc-500 font-light italic pr-6 border-r-2 border-zinc-100">${post.excerpt}</p>
+            if (!post) return navigateTo('list');
+            document.getElementById('post-detail-content').innerHTML = `
+                <header class="mb-24 text-center">
+                    <div class="text-[11px] font-black uppercase tracking-[0.5em] text-[var(--accent-ochre)] mb-10">${post.category} • ${post.date}</div>
+                    <h1 class="serif text-6xl md:text-8xl font-bold mb-14 leading-[1.05] tracking-tighter text-[var(--dynamic-accent)]">${post.title}</h1>
+                    <div class="max-w-2xl mx-auto">
+                        <p class="text-3xl text-zinc-500 italic font-light leading-relaxed">${post.excerpt}</p>
+                    </div>
+                    <div class="h-2 w-24 bg-[var(--dynamic-accent)] mx-auto mt-20 transition-all duration-1000"></div>
                 </header>
                 <div class="prose max-w-none">${post.content}</div>
+                <div class="mt-40 pt-24 border-t-2 border-zinc-200 text-center">
+                    <p class="serif text-2xl mb-10 font-bold">סוף המאמר.</p>
+                    <button onclick="navigateTo('list')" class="text-[11px] font-black uppercase tracking-[0.4em] text-[var(--dynamic-accent)] hover:text-black transition-colors underline underline-offset-8">חזור לארכיון</button>
+                </div>
             `;
+            document.getElementById('edit-post-btn').onclick = () => openEditor(post.id);
+            document.getElementById('delete-post-btn').onclick = () => deletePost(post.id);
         }
 
-        window.handleSearch = function(query) {
-            const filtered = posts.filter(p => 
-                p.title.includes(query) || p.excerpt.includes(query) || p.content.includes(query)
-            );
-            renderPosts(filtered);
+        // --- Editor ---
+        window.openEditor = (id = null) => {
+            currentEditingId = id;
+            const post = id ? posts.find(p => p.id === id) : { title: '', category: 'עיצוב', excerpt: '', content: '' };
+            document.getElementById('edit-title').value = post.title;
+            document.getElementById('edit-category').value = post.category;
+            document.getElementById('edit-excerpt').value = post.excerpt;
+            document.getElementById('edit-content').value = post.content;
+            navigateTo('editor');
         };
 
-        // --- AI & Editor Logic ---
-        window.generateWithAI = async function() {
+        window.saveChanges = () => {
+            const data = {
+                title: document.getElementById('edit-title').value,
+                category: document.getElementById('edit-category').value,
+                excerpt: document.getElementById('edit-excerpt').value,
+                content: document.getElementById('edit-content').value,
+                date: new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })
+            };
+
+            if (currentEditingId) {
+                const idx = posts.findIndex(p => p.id === currentEditingId);
+                posts[idx] = { ...posts[idx], ...data };
+            } else {
+                posts.unshift({ id: Date.now().toString(), ...data });
+            }
+
+            hasChanges = true;
+            navigateTo('list');
+        };
+
+        function deletePost(id) {
+            if (!confirm("האם למחוק לצמיתות?")) return;
+            posts = posts.filter(p => p.id !== id);
+            hasChanges = true;
+            navigateTo('list');
+        }
+
+        // --- Sync ---
+        window.toggleSettings = () => {
+            const modal = document.getElementById('settings-modal');
+            modal.classList.toggle('hidden');
+            if (!modal.classList.contains('hidden')) {
+                document.getElementById('gh-token').value = localStorage.getItem('gh_token') || '';
+                document.getElementById('gh-owner').value = localStorage.getItem('gh_owner') || '';
+                document.getElementById('gh-repo').value = localStorage.getItem('gh_repo') || '';
+            }
+        };
+
+        window.saveSettings = () => {
+            localStorage.setItem('gh_token', document.getElementById('gh-token').value);
+            localStorage.setItem('gh_owner', document.getElementById('gh-owner').value);
+            localStorage.setItem('gh_repo', document.getElementById('gh-repo').value);
+            toggleSettings();
+            updatePublishUI();
+        };
+
+        function updatePublishUI() {
+            const btn = document.getElementById('global-publish-btn');
+            const container = document.getElementById('publish-container');
+            const token = localStorage.getItem('gh_token');
+            if (hasChanges) {
+                container.classList.remove('hidden');
+                if (token) {
+                    btn.classList.add('dirty');
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.disabled = false;
+                }
+            } else {
+                container.classList.add('hidden');
+            }
+        }
+
+        window.publishToGithub = async () => {
+            const btn = document.getElementById('global-publish-btn');
+            const token = localStorage.getItem('gh_token');
+            const owner = localStorage.getItem('gh_owner');
+            const repo = localStorage.getItem('gh_repo');
+
+            if (!token) return alert("אנא הגדר טוקן.");
+
+            btn.disabled = true;
+            btn.innerText = "מעלה...";
+
+            try {
+                const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/index.html`;
+                const res = await fetch(apiUrl, { headers: { 'Authorization': `token ${token}` }});
+                const fileData = await res.json();
+                const currentContent = decodeURIComponent(escape(atob(fileData.content)));
+
+                const newPostsJson = JSON.stringify(posts, null, 12);
+                const newContent = currentContent.replace(/let posts = \[[\s\S]*?\];/, `let posts = ${newPostsJson};`);
+
+                const updateRes = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `token ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: "Content Update",
+                        content: btoa(unescape(encodeURIComponent(newContent))),
+                        sha: fileData.sha
+                    })
+                });
+
+                if (updateRes.ok) {
+                    alert("הפרסום הושלם!");
+                    hasChanges = false;
+                    document.getElementById('last-update-time').innerText = new Date().toLocaleTimeString();
+                    updatePublishUI();
+                }
+            } catch (err) { alert("שגיאה!"); } finally { 
+                btn.disabled = false; 
+                btn.innerText = "פרסם שינויים לענן";
+            }
+        };
+
+        // --- AI ---
+        window.generateWithAI = async () => {
             const prompt = document.getElementById('ai-prompt').value;
             const btn = document.getElementById('ai-btn');
             if (!prompt) return;
-
-            const apiKey = window.process.env.API_KEY;
-            if (!apiKey) {
-                alert("מפתח API חסר. אנא וודא שהסביבה מוגדרת כראוי.");
-                return;
-            }
 
             btn.disabled = true;
             btn.innerText = 'מנסח...';
 
             try {
-                const ai = new GoogleGenAI({ apiKey });
+                const ai = new GoogleGenAI({ apiKey: window.process.env.API_KEY });
                 const response = await ai.models.generateContent({
                     model: 'gemini-3-flash-preview',
-                    contents: `Generate a blog post in Hebrew about: ${prompt}. Return a JSON object with title, content (HTML), and excerpt.`,
+                    contents: `צור מאמר מרתק בעברית גבוהה על: ${prompt}. החזר JSON: title, content (HTML), excerpt.`,
                     config: {
                         responseMimeType: 'application/json',
                         responseSchema: {
@@ -274,51 +563,16 @@
                         }
                     }
                 });
-
                 const data = JSON.parse(response.text);
-                document.getElementById('editor-title').value = data.title;
-                document.getElementById('editor-excerpt').value = data.excerpt;
-                document.getElementById('editor-content').value = data.content;
-                document.getElementById('ai-prompt').value = '';
-            } catch (err) {
-                console.error(err);
-                alert("שגיאה בתקשורת עם ה-AI.");
-            } finally {
-                btn.disabled = false;
-                btn.innerText = 'צור טיוטה';
-            }
+                document.getElementById('edit-title').value = data.title;
+                document.getElementById('edit-excerpt').value = data.excerpt;
+                document.getElementById('edit-content').value = data.content;
+            } catch (e) { alert("AI Error"); } finally { btn.disabled = false; btn.innerText = 'צור'; }
         };
 
-        window.savePost = function() {
-            const title = document.getElementById('editor-title').value;
-            const excerpt = document.getElementById('editor-excerpt').value;
-            const content = document.getElementById('editor-content').value;
-
-            if (!title || !content) {
-                alert("אנא מלא כותרת ותוכן.");
-                return;
-            }
-
-            const newPost = {
-                id: Date.now().toString(),
-                title, excerpt, content,
-                category: 'חדש',
-                date: new Date().toLocaleDateString('he-IL', { day: 'numeric', month: 'long', year: 'numeric' })
-            };
-
-            posts = [newPost, ...posts];
-            navigateTo('list');
-            
-            // Reset editor
-            document.getElementById('editor-title').value = '';
-            document.getElementById('editor-excerpt').value = '';
-            document.getElementById('editor-content').value = '';
-        };
-
-        // --- Initialization ---
+        // --- Init ---
         document.getElementById('last-update-time').innerText = new Date().toLocaleTimeString();
-        navigateTo('list');
-
+        renderPosts();
     </script>
 </body>
 </html>
